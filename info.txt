@@ -1,0 +1,3 @@
+Libs neaded to run this project:
+
+        pygame
