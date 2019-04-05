@@ -1,3 +1,5 @@
 .idea/
 venv/
 setup.py
+test.py
+intro_ball.gif
