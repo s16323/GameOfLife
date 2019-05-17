@@ -2,7 +2,9 @@
 
 
 screen.blit()               - draw to screen
+screen.blit(ball, ballrect)     # draw to the screen (.draw does the blit anyway, so no need to call it here)
 pygame.display.flip()       - push into video memory
+
 
 pygame.draw.rect()
 
