@@ -1,4 +1,8 @@
-import sys, pygame, random
+import sys, pygame, random, time
+
+# TODO add docstrings
+# TODO add keybinds
+# TODO add README
 
 
 """CONSTANTS"""
@@ -11,27 +15,23 @@ custom_color = 150, 50, 150
 ALIVE_COLOR = custom_color
 DEAD_COLOR = black
 FPS = 5
-WALLS_PRESENT = 1       # 1 - walls present, 0 - no walls
+WALLS_PRESENT = 0       # 1 - walls present, 0 - no walls
 SHAPE = 'circle'      # circle/rectangle
 
 
 class LifeGame:
 
     def __init__(self):
-        """CONSTANTS"""
-        # black = 0, 0, 0
-        # white = 255, 255, 255
-        # red = 255, 0, 0
         # TODO take these as constructor args:
-        BOARD_SIZE = WIDTH, HEIGHT = 320 * 2, 240 * 2
-        CELL_SIZE = 10
-        organism_color = 150, 250, 150
-        environment_color = 0, 0, 0
-        ALIVE_COLOR = organism_color
-        DEAD_COLOR = environment_color
-        FPS = 5
-        WALLS_PRESENT = 1  # 1 - walls present, 0 - no walls
-        SHAPE = 'circle'  # circle/rectangle
+        # BOARD_SIZE = WIDTH, HEIGHT = 320 * 2, 240 * 2
+        # CELL_SIZE = 10
+        # organism_color = 150, 250, 150
+        # environment_color = 0, 0, 0
+        # ALIVE_COLOR = organism_color
+        # DEAD_COLOR = environment_color
+        # FPS = 5
+        # WALLS_PRESENT = 1  # 1 - walls present, 0 - no walls
+        # SHAPE = 'circle'  # circle/rectangle
 
 
         pygame.init()
@@ -49,6 +49,8 @@ class LifeGame:
         self.grids = []
         self.init_grids()
         self.set_grid()
+        self.paused = False
+        self.game_over = False
 
     def init_grids(self):
 
@@ -63,8 +65,6 @@ class LifeGame:
 
         self.grids.append(create_grid())
         self.grids.append(create_grid())
-
-        # print(self.grids)     # debug grids
 
     def set_grid(self, value=None, grid=0):
         '''
@@ -107,23 +107,18 @@ class LifeGame:
 
         # check all 8 neighbors, add up alive count:
         def get_cell(r, c):
-            # cell_value = 0
             try:
                 cell_value = int(self.grids[self.active_grid][r][c]) # Check if a cell is alive, cells outsde of boundries are of type 'None' - they can't be cast to int
             except:
-                # cell_value = WALLS_PRESENT  # walls are transparent
-                cell_value = WALLS_PRESENT  # walls are solid
+                cell_value = WALLS_PRESENT  # walls are solid or transparent WALLS_PRESENT = 0 or 1
             return cell_value
 
         num_alive_neighbors = 0
-
         num_alive_neighbors += get_cell(row_index - 1, col_index - 1)
         num_alive_neighbors += get_cell(row_index - 1, col_index)
         num_alive_neighbors += get_cell(row_index - 1, col_index + 1)
-
         num_alive_neighbors += get_cell(row_index, col_index - 1)
         num_alive_neighbors += get_cell(row_index, col_index + 1)
-
         num_alive_neighbors += get_cell(row_index + 1, col_index - 1)
         num_alive_neighbors += get_cell(row_index + 1, col_index)
         num_alive_neighbors += get_cell(row_index + 1, col_index + 1)
@@ -165,9 +160,64 @@ class LifeGame:
 
     def handle_events(self):
         for event in pygame.event.get():
-            # if ket "s" is pressed toggle pause game
-            # if key "r" is pressed randomise grid
-            # if key "q" quit
+            if event.type == pygame.KEYDOWN:
+                # if key "s" is pressed toggle pause game
+                if event.unicode == 's':
+                    print("Toggling Pause")
+                    if self.paused:
+                        self.paused = False
+                    else:
+                        self.paused = True
+                # if key "r" is pressed randomise grid
+                elif event.unicode == 'r':
+                    print("Randomizing grid")
+                    self.active_grid = 0                    # purge active grid
+                    self.set_grid(None, self.active_grid)   # randomize active grid
+                    self.set_grid(0, self.inactive_grid())  # set inactive grid to 0
+                    self.draw_grid()                        # redraw new grid even if paused
+                # if key "q" quit
+                elif event.unicode == 'q':
+                    print("Exiting.")
+                    self.game_over = True
+                # if key "k" kill all
+                elif event.unicode == 'k':
+                    print("Killing all")
+                    self.set_grid(0, self.active_grid)          # set active grid to 0
+                    self.set_grid(0, self.inactive_grid())      # set inactive grid to 0
+                    self.draw_grid()                            # redraw empty grid even if paused
+
+            # draw and remove creatures with L/R mouse
+            if event.type == pygame.MOUSEMOTION or event.type == pygame.MOUSEBUTTONDOWN:
+                state = pygame.mouse.get_pressed()
+                # when left mouse is down draw a creature
+                while state == (1, 0, 0):
+                    self.paused = True
+                    print("mouse state: ", state)
+                    print(event)
+                    pos = pygame.mouse.get_pos()
+                    # print("mouse position:  ", pos)
+                    x = int(pos[0] / CELL_SIZE)
+                    y = int(pos[1] / CELL_SIZE)
+                    # print("coordinates: ", x, y)
+
+                    self.grids[self.active_grid][y][x] = 1
+                    self.draw_grid()
+                    state = pygame.mouse.get_rel()
+
+                # when right mouse is down remove a creature
+                while state == (0, 0, 1):
+                    self.paused = True
+                    print("mouse state: ", state)
+                    print(event)
+                    pos = pygame.mouse.get_pos()
+                    x = int(pos[0] / CELL_SIZE)
+                    y = int(pos[1] / CELL_SIZE)
+                    self.grids[self.active_grid][y][x] = 0
+                    self.draw_grid()
+                    state = pygame.mouse.get_rel()
+
+            # print(event)
+
             if event.type == pygame.QUIT:
                 sys.exit()
 
@@ -186,9 +236,14 @@ class LifeGame:
         self.last_update_completed = now
 
     def run(self):
+        print("Controlls: s - pause  r - randomize  k - kill all  q - quit")
 
         while True:
+            if self.game_over:
+                return
             self.handle_events()
+            if self.paused:
+                continue        # when paused just shortcut the loop, but keep handle_events() going
             self.update_generation()
             self.draw_grid()
             self.cap_framerate()
