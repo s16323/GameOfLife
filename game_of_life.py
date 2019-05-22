@@ -1,20 +1,19 @@
-import sys, pygame, random, time
+import sys, pygame, random
 
 # TODO add docstrings
-# TODO add keybinds
 # TODO add README
 
 
 """CONSTANTS"""
-BOARD_SIZE = WIDTH, HEIGHT = 320*2, 240*2
-CELL_SIZE = 10
+BOARD_SIZE = WIDTH, HEIGHT = 320*4, 240*4
+CELL_SIZE = 5
 black = 0, 0, 0
 white = 255, 255, 255
 red = 255, 0, 0
 custom_color = 150, 50, 150
 ALIVE_COLOR = custom_color
 DEAD_COLOR = black
-FPS = 5
+FPS = 10
 WALLS_PRESENT = 0       # 1 - walls present, 0 - no walls
 SHAPE = 'circle'      # circle/rectangle
 
@@ -192,8 +191,8 @@ class LifeGame:
                 # when left mouse is down draw a creature
                 while state == (1, 0, 0):
                     self.paused = True
-                    print("mouse state: ", state)
-                    print(event)
+                    # print("mouse state: ", state)     # debug
+                    # print(event)                      # debug
                     pos = pygame.mouse.get_pos()
                     # print("mouse position:  ", pos)
                     x = int(pos[0] / CELL_SIZE)
@@ -207,8 +206,8 @@ class LifeGame:
                 # when right mouse is down remove a creature
                 while state == (0, 0, 1):
                     self.paused = True
-                    print("mouse state: ", state)
-                    print(event)
+                    # print("mouse state: ", state)     # debug
+                    # print(event)                      # debug
                     pos = pygame.mouse.get_pos()
                     x = int(pos[0] / CELL_SIZE)
                     y = int(pos[1] / CELL_SIZE)
@@ -216,7 +215,7 @@ class LifeGame:
                     self.draw_grid()
                     state = pygame.mouse.get_rel()
 
-            # print(event)
+            # print(event)      # debug
 
             if event.type == pygame.QUIT:
                 sys.exit()
@@ -236,7 +235,10 @@ class LifeGame:
         self.last_update_completed = now
 
     def run(self):
-        print("Controlls: s - pause  r - randomize  k - kill all  q - quit")
+        print(" ======================Conway's Game Of Life=======================\n",
+              "Controlls: s - pause/resume  r - randomize  k - kill all  q - quit\n",
+              "Left Mouse - draw   Right Mouse - erase\n",
+              "==================================================================")
 
         while True:
             if self.game_over:

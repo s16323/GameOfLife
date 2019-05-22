@@ -1,0 +1,37 @@
+
+CONWAY'S GAME OF LIFE
+=====================
+
+
+Autor
+-----
+
+    Artur Dembicki
+    nr indeksu: 16323
+
+
+Przedmiot
+---------
+
+
+    Symulacje i gry decyzyjne
+    PJATK semestr 6
+
+
+O projekcie
+-----------
+
+Do uruchomienia projektu potrzebna jest biblioteka pygame
+
+Projekt polega na implementacji slynnego algorytmu Johna Conway'a "Game of life".
+Program symuluje srodowisko prostych wirtualnych "organizmow", ktorych zycie rzadzi sie nastepujcymi zasadami:
+
+    - Martwa komórka, która ma dokładnie 3 żywych sąsiadów, staje się żywa w następnej jednostce czasu (rodzi się)
+    - Żywa komórka z 2 albo 3 żywymi sąsiadami pozostaje nadal żywa; przy innej liczbie sąsiadów umiera (z „samotności” albo „zatłoczenia”)
+
+Program umozliwia:
+
+1. Wygenerowanie losowej tablicy "organizmow"
+2. Wyczyszczenie tablicy
+3. Rysowanie i usuwanie nowych organizmw za pomoc lewej i prawej myszy
+4. Przerywanie i wznawianie symulacji
