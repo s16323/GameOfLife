@@ -31,7 +31,8 @@ Program symuluje srodowisko prostych wirtualnych "organizmow", ktorych zycie rza
 
 Program umozliwia:
 
-1. Wygenerowanie losowej tablicy "organizmow"
-2. Wyczyszczenie tablicy
+1. 'R' - Wygenerowanie losowej tablicy "organizmow"
+2. 'K' -Wyczyszczenie tablicy
 3. Rysowanie i usuwanie nowych organizmw za pomoc lewej i prawej myszy
-4. Przerywanie i wznawianie symulacji
+4. 'S' - Przerywanie i wznawianie symulacji
+5. 'Q' - Quit
