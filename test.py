@@ -23,3 +23,7 @@ while 1:
     screen.fill(black)
     screen.blit(ball, ballrect)
     pygame.display.flip()
+
+# x = None
+# y = int(x)
+# print(y)
