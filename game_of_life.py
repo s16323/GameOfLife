@@ -5,7 +5,7 @@ import sys, pygame, random
 
 
 """CONSTANTS"""
-BOARD_SIZE = WIDTH, HEIGHT = 320*4, 240*4
+BOARD_SIZE = WIDTH, HEIGHT = 320*2, 240*2
 CELL_SIZE = 5
 black = 0, 0, 0
 white = 255, 255, 255
@@ -56,17 +56,22 @@ class LifeGame:
         print("Columns: %d\nRows: %d" % (self.num_cols, self.num_rows))       # debug - print out how many rows and columns
 
         def create_grid():
+            '''
+            Creates a table of rows, where each row is as long as number of columns
+            '''
             rows = []
             for row_num in range(self.num_rows):
                 list_of_columns = [0] * self.num_cols
                 rows.append(list_of_columns)
             return rows
 
+        # Create 2 grids:
         self.grids.append(create_grid())
         self.grids.append(create_grid())
 
-    def set_grid(self, value=None, grid=0):
+    def set_grid(self, value=None, grid=0):                 # by default use grid nr 0 from grids[] array
         '''
+        This function fills existing grids with 0 and 1 according to parameters given
         Examples:
         set_grid() or set_grid(None) - randomize grid
         set_grid(0) - zero out the grid - all dead
@@ -75,30 +80,35 @@ class LifeGame:
         for r in range(self.num_rows):
             for c in range(self.num_cols):
                 if value is None:
-                    cell_value = random.choice([0, 1])
+                    cell_value = random.choice([0, 1])      # pick a random value of 0 or 1
                 else:
-                    cell_value = value
-                self.grids[grid][r][c] = cell_value
+                    cell_value = value                      # pick a value as given in the argument
+                self.grids[grid][r][c] = cell_value         # place a given value into [r,c] cell in the grid
 
     def clear_screen(self):
-        self.screen.fill(DEAD_COLOR)
+        self.screen.fill(DEAD_COLOR)                        # pygame function
 
     def draw_grid(self):
         self.clear_screen()
-        # circle = pygame.draw.circle(self.screen, ALIVE_COLOR, (50, 50), 5, 0)    # circle(Surface, color, pos, radius, width=0)   -->   <class 'pygame.Rect'>
+        # circle = pygame.draw.circle(self.screen, ALIVE_COLOR, (50, 50), 5, 0)       # circle(Surface, color, pos, radius, width=0)   -->   <class 'pygame.Rect'>
         # rect = pygame.draw.rect(self.screen, ALIVE_COLOR, [50, 50, 10, 10], 0)      # rect(Surface, color, Rect, width=0)   ->   <class 'pygame.Rect'>   (rect = [X_coord, y_coord, length, height])
 
         for r in range(self.num_rows):
             for c in range(self.num_cols):
+
+                # chose colors for alive and dead cells according to ALIVE_COLOR and DEAD_COLOR constants
                 if self.grids[self.active_grid][r][c] == 1:
                     color = ALIVE_COLOR
                 else:
                     color = DEAD_COLOR
+
+                # allow cell shape changing - circle or rectangle are set in SHAPE constant for now
                 if SHAPE == 'rectangle':
                     pygame.draw.rect(self.screen, color, [int(c * CELL_SIZE), int(r * CELL_SIZE), CELL_SIZE, CELL_SIZE], 0)
                 elif SHAPE == 'circle':
                     pygame.draw.circle(self.screen, color, (int(c * CELL_SIZE + (CELL_SIZE / 2)), int(r * CELL_SIZE + (CELL_SIZE / 2))), int(CELL_SIZE / 2), 0)
-        pygame.display.flip()
+
+        pygame.display.flip()       # pygame function - flip draws to the screen
 
     def check_cell_neighbors(self, row_index, col_index):
         # get number of alive cells surrounding current cell:
@@ -107,13 +117,13 @@ class LifeGame:
         # check all 8 neighbors, add up alive count:
         def get_cell(r, c):
             try:
-                cell_value = int(self.grids[self.active_grid][r][c]) # Check if a cell is alive, cells outsde of boundries are of type 'None' - they can't be cast to int
+                cell_value = int(self.grids[self.active_grid][r][c])    # Check if a cell is alive, cells outsde of boundries are of type 'None' - they can't be cast to int
             except:
-                cell_value = WALLS_PRESENT  # walls are solid or transparent WALLS_PRESENT = 0 or 1
+                cell_value = WALLS_PRESENT      # walls are solid (don't allow replication) or 'alive' (allow replication) - driven by constant WALLS_PRESENT
             return cell_value
 
-        num_alive_neighbors = 0
-        num_alive_neighbors += get_cell(row_index - 1, col_index - 1)
+        num_alive_neighbors = 0                                             # start counting neighbors from 0
+        num_alive_neighbors += get_cell(row_index - 1, col_index - 1)       # count neighbors aroud, starting from upper left:
         num_alive_neighbors += get_cell(row_index - 1, col_index)
         num_alive_neighbors += get_cell(row_index - 1, col_index + 1)
         num_alive_neighbors += get_cell(row_index, col_index - 1)
@@ -122,17 +132,17 @@ class LifeGame:
         num_alive_neighbors += get_cell(row_index + 1, col_index)
         num_alive_neighbors += get_cell(row_index + 1, col_index + 1)
 
-        # RULES:
-        if self.grids[self.active_grid][row_index][col_index] == 1:     # living cell
-            if num_alive_neighbors > 3:  # overpopulation - dies
+        # MAIN RULES:
+        if self.grids[self.active_grid][row_index][col_index] == 1:       # living cell
+            if num_alive_neighbors > 3:                                   # overpopulation - dies
                 return 0
-            if num_alive_neighbors < 2:  # underpopulation - dies
+            if num_alive_neighbors < 2:                                   # underpopulation - dies
                 return 0
-            if num_alive_neighbors == 2 or num_alive_neighbors == 3:  # survives
+            if num_alive_neighbors == 2 or num_alive_neighbors == 3:      # just right - survives
                 return 1
 
         elif self.grids[self.active_grid][row_index][col_index] == 0:     # dead cell
-            if num_alive_neighbors == 3:  # comes to life
+            if num_alive_neighbors == 3:                                  # exactly 3 - comes to life
                 return 1
 
         return self.grids[self.active_grid][row_index][col_index]
@@ -155,10 +165,10 @@ class LifeGame:
         self.active_grid = self.inactive_grid()
 
     def inactive_grid(self):
-        return (self.active_grid + 1) % 2
+        return (self.active_grid + 1) % 2       # gives 0 or 1 depending on which grid is now active
 
     def handle_events(self):
-        for event in pygame.event.get():
+        for event in pygame.event.get():        # pygame function - listen for events
             if event.type == pygame.KEYDOWN:
                 # if key "s" is pressed toggle pause game
                 if event.unicode == 's':
@@ -222,8 +232,8 @@ class LifeGame:
 
     def cap_framerate(self):
 
-        # hard cap at a 60fps:
-        # time.sleep(1 / 60)
+        # hard cap at a 60fps:          # debug
+        # time.sleep(1 / 60)            # debug
 
         # if time since last frame < 1/60 s sleep for remaining time:
         now = pygame.time.get_ticks()
@@ -238,6 +248,7 @@ class LifeGame:
         print(" ======================Conway's Game Of Life=======================\n",
               "Controlls: s - pause/resume  r - randomize  k - kill all  q - quit\n",
               "Left Mouse - draw   Right Mouse - erase\n",
+              "                                                 by Artur Dembicki\n",
               "==================================================================")
 
         while True:
