@@ -26,29 +26,29 @@
 #     screen.blit(ball, ballrect)
 #     pygame.display.flip()
 
-overpopulated = 3
-underpopulated = 2
-just_right = 2
-parents = 3
-
-def display_rules():
-
-    print("\nCurrent Rules: \n",
-          "Cell dies from overpopulation with over: {} neighbors\n".format(overpopulated),
-          "Cell dies from underpopulation with less than: {} neighbors\n".format(underpopulated),
-          "Cell is born from exactly: {} neighbors\n".format(parents),
-          )
-
-def change_rules():
-    overpopulated = input("Death from overpopulation from: ")
-    underpopulated = input("Death from underpopulation: ")
-    parents = input("Parents required: ")
-    # display_rules()
-
-
-while True:
-    display_rules()
-    change_rules()
+# overpopulated = 3
+# underpopulated = 2
+# just_right = 2
+# parents = 3
+#
+# def display_rules():
+#
+#     print("\nCurrent Rules: \n",
+#           "Cell dies from overpopulation with over: {} neighbors\n".format(overpopulated),
+#           "Cell dies from underpopulation with less than: {} neighbors\n".format(underpopulated),
+#           "Cell is born from exactly: {} neighbors\n".format(parents),
+#           )
+#
+# def change_rules():
+#     overpopulated = input("Death from overpopulation from: ")
+#     underpopulated = input("Death from underpopulation: ")
+#     parents = input("Parents required: ")
+#     # display_rules()
+#
+#
+# while True:
+#     display_rules()
+#     change_rules()
 
 
 
