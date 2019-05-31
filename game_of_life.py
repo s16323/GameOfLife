@@ -301,6 +301,3 @@ if __name__ == '__main__':          # in other words: if you run this file direc
 
     game = LifeGame()
     game.run()
-
-
-
