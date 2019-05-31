@@ -36,3 +36,5 @@ Program umozliwia:
 3.  Rysowanie i usuwanie nowych organizmw za pomoc lewej i prawej myszy
 4. 'S' - Przerywanie i wznawianie symulacji
 5. 'Q' - Quit
+6. 'C' - Przejście do wyboru nowych zasad - w konsoli
+7. 'D' - Przywrócenie zasad domyślnych
