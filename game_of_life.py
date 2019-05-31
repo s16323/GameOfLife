@@ -5,7 +5,7 @@ import sys, pygame, random
 
 
 """CONSTANTS"""
-BOARD_SIZE = WIDTH, HEIGHT = 320*4, 240*4
+BOARD_SIZE = WIDTH, HEIGHT = 320*2, 240*2
 CELL_SIZE = 5
 black = 0, 0, 0
 white = 255, 255, 255
@@ -16,7 +16,10 @@ DEAD_COLOR = black
 FPS = 10
 WALLS_PRESENT = 0       # 1 - walls present, 0 - no walls
 SHAPE = 'circle'      # circle/rectangle
-
+OVERPOPULATED_DEFAULT = 3
+UNDERPOPULATED_DEFAULT = 2
+JUST_RIGHT_DEFAULT = 2
+PARENTS_DEFAULT = 3
 
 class LifeGame:
 
@@ -32,6 +35,11 @@ class LifeGame:
         # WALLS_PRESENT = 1  # 1 - walls present, 0 - no walls
         # SHAPE = 'circle'  # circle/rectangle
 
+        #RULES OF THE GAME:
+        self.overpopulated = OVERPOPULATED_DEFAULT
+        self.underpopulated = UNDERPOPULATED_DEFAULT
+        self.just_right = JUST_RIGHT_DEFAULT
+        self.parents = PARENTS_DEFAULT
 
         pygame.init()
         self.screen = pygame.display.set_mode(BOARD_SIZE)
@@ -124,16 +132,17 @@ class LifeGame:
 
         # RULES:
         if self.grids[self.active_grid][row_index][col_index] == 1:     # living cell
-            if num_alive_neighbors > 3:  # overpopulation - dies
+            if num_alive_neighbors > self.overpopulated:  # overpopulation - dies
                 return 0
-            if num_alive_neighbors < 2:  # underpopulation - dies
+            if num_alive_neighbors < self.underpopulated:  # underpopulation - dies
                 return 0
-            if num_alive_neighbors == 2 or num_alive_neighbors == 3:  # survives
+            if num_alive_neighbors == self.just_right or num_alive_neighbors == self.just_right + 1:  # survives
                 return 1
 
         elif self.grids[self.active_grid][row_index][col_index] == 0:     # dead cell
             if num_alive_neighbors == 3:  # comes to life
                 return 1
+
 
         return self.grids[self.active_grid][row_index][col_index]
 
@@ -184,8 +193,17 @@ class LifeGame:
                     self.set_grid(0, self.active_grid)          # set active grid to 0
                     self.set_grid(0, self.inactive_grid())      # set inactive grid to 0
                     self.draw_grid()                            # redraw empty grid even if paused
+                # if key "c" ask for new rules
+                elif event.unicode == 'c':
+                    print("Change rules:\n")
+                    self.change_rules()
+                    # self.draw_grid()
+                # if key "c" ask for new rules
+                elif event.unicode == 'd':
+                    print("Reseting rules to default...\n")
+                    self.reset_rules_to_default()
 
-            # draw and remove creatures with L/R mouse
+                    # draw and remove creatures with L/R mouse
             if event.type == pygame.MOUSEMOTION or event.type == pygame.MOUSEBUTTONDOWN:
                 state = pygame.mouse.get_pressed()
                 # when left mouse is down draw a creature
@@ -234,11 +252,38 @@ class LifeGame:
             pygame.time.delay(int(time_to_sleep))
         self.last_update_completed = now
 
-    def run(self):
+    def display_rules(self):
         print(" ======================Conway's Game Of Life=======================\n",
-              "Controlls: s - pause/resume  r - randomize  k - kill all  q - quit\n",
+              "Controlls:\n",
+              "s - pause/resume  r - randomize  k - kill all  q - quit\n",
+              "c - change rules  d - default rules\n"
               "Left Mouse - draw   Right Mouse - erase\n",
               "==================================================================")
+        print("\nCurrent Rules: \n",
+              "Cell dies from overpopulation with over: {} neighbors\n".format(self.overpopulated),
+              "Cell dies from underpopulation with less than: {} neighbors\n".format(self.underpopulated),
+              "Cell lives on with exactly {} or {} neighbors\n".format(str(self.just_right), str(self.just_right + 1)),
+              # "Cell lives on with exactly {}\n".format(self.just_right),
+              "Cell is born from exactly: {} neighbors\n".format(self.parents)
+              )
+
+    def change_rules(self):
+        self.overpopulated = int(input("Death from overpopulation from: "))
+        self.underpopulated = int(input("Death from underpopulation: "))
+        self.just_right = int(input("Stays alive when: "))
+        self.parents = int(input("Parents required: "))
+        self.display_rules()
+
+    def reset_rules_to_default(self):
+        self.overpopulated = OVERPOPULATED_DEFAULT
+        self.underpopulated = UNDERPOPULATED_DEFAULT
+        self.just_right = JUST_RIGHT_DEFAULT
+        self.parents = PARENTS_DEFAULT
+        self.display_rules()
+
+    def run(self):
+
+        self.display_rules()
 
         while True:
             if self.game_over:
